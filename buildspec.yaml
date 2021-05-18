@@ -1,0 +1,22 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      python: 3.7
+  pre_build:
+    commands:
+      - echo "Starting build ViaVarejo MLops stack"
+      - pip install -q awscli aws-sam-cli wheel
+  build:
+    commands:
+      - sam build
+      - sam package --output-template-file packaged.yaml --s3-bucket vvml-resources --s3-prefix data-artifacts --region us-east-1
+      - sam deploy --stack-name viavarejo-mlops-test --template-file packaged.yaml --capabilities CAPABILITY_IAM --region us-east-1 --no-fail-on-empty-changeset
+      
+  post_build:
+    commands:
+      - echo "Packaging completed on `date`"
+
+artifacts:
+  files:
+    - packaged.yaml
